@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>깃털 패턴 수학 도감</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --ink: #1a1614;
+  --muted: #7a726a;
+  --rule: #ddd8d0;
+  --accent1: #c84b2f;   /* 분기 구조 */
+  --accent2: #2a6b4f;   /* 파동 */
+  --accent3: #1e4a8a;   /* 광학 */
+  --accent4: #7c3aed;   /* 프랙탈 */
+  --accent5: #b45309;   /* 훅 메커니즘 */
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Noto Sans KR', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.6;
+}
+
+/* ─── HEADER ─── */
+.site-header {
+  background: var(--ink);
+  color: #f7f4ef;
+  padding: 36px 48px 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 4px solid var(--accent1);
+}
+
+.header-title {
+  font-family: var(--mono);
+  font-size: clamp(20px, 2.8vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.header-sub {
+  font-size: 12px;
+  opacity: 0.55;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  font-family: var(--mono);
+}
+
+.header-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  border: 1px solid rgba(247,244,239,0.25);
+  padding: 6px 14px;
+  border-radius: 2px;
+  opacity: 0.6;
+  letter-spacing: 0.1em;
+}
+
+/* ─── NAV TABS ─── */
+.nav-strip {
+  background: var(--ink);
+  padding: 0 48px;
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  overflow-x: auto;
+}
+
+.nav-tab {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 14px 22px;
+  color: rgba(247,244,239,0.4);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.18s;
+  white-space: nowrap;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-tab .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.nav-tab.active { color: #f7f4ef; }
+.nav-tab:hover:not(.active) { color: rgba(247,244,239,0.7); }
+
+/* ─── MAIN LAYOUT ─── */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  min-height: calc(100vh - 132px);
+}
+
+/* ─── LEFT: CONTENT ─── */
+.content-area { padding: 40px 48px; border-right: 1px solid var(--rule); }
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* Pattern block = equation + canvas + effect */
+.pattern-block {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.pb-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.pb-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.6;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.pb-name {
+  font-weight: 700;
+  font-size: 15px;
+  flex: 1;
+}
+
+.pb-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 3px 10px;
+  border-radius: 2px;
+  color: #fff;
+}
+
+/* three-column body */
+.pb-body {
+  display: grid;
+  grid-template-columns: 240px 1fr 1fr;
+}
+
+.pb-col {
+  padding: 20px 22px;
+  border-right: 1px solid var(--rule);
+}
+.pb-col:last-child { border-right: none; }
+
+.col-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.col-label .icon { font-size: 11px; }
+
+/* EQUATION box */
+.eq-box {
+  background: #f0ede8;
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 2;
+  color: var(--ink);
+}
+
+.eq-var {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.var-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.var-sym {
+  font-family: var(--mono);
+  font-weight: 700;
+  min-width: 28px;
+  color: var(--accent1);
+}
+
+.var-desc { color: var(--muted); }
+
+/* CANVAS */
+.pb-canvas-wrap {
+  background: #fafaf8;
+  position: relative;
+}
+
+.pb-canvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+}
+
+/* EFFECT */
+.effect-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.effect-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.effect-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.effect-text { color: var(--ink); }
+.effect-text strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.application-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+/* ─── RIGHT: SIDEBAR ─── */
+.sidebar { padding: 36px 32px; background: var(--surface); }
+
+.sidebar-section { margin-bottom: 36px; }
+
+.sidebar-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* PARAM SLIDERS */
+.param-group { display: flex; flex-direction: column; gap: 16px; }
+
+.param-row { display: flex; flex-direction: column; gap: 6px; }
+
+.param-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.param-name {
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.param-sym {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.param-value {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 50px;
+  text-align: right;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--rule);
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--ink);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+/* LIVE READOUT */
+.live-readout {
+  background: var(--ink);
+  color: #f7f4ef;
+  border-radius: 5px;
+  padding: 16px 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.9;
+}
+
+.readout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.readout-key { opacity: 0.5; }
+.readout-val { color: #fcd34d; font-weight: 700; }
+
+/* FORMULA INDEX */
+.formula-index { display: flex; flex-direction: column; gap: 8px; }
+
+.fi-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.fi-row:hover { border-color: var(--ink); }
+
+.fi-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+  width: 18px;
+}
+
+.fi-content { flex: 1; }
+
+.fi-formula {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.fi-name { font-size: 10px; color: var(--muted); }
+
+/* ─── SUMMARY TABLE ─── */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.summary-table th {
+  background: var(--ink);
+  color: #f7f4ef;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.summary-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.summary-table tr:hover td { background: #fafaf8; }
+
+.td-formula {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent3);
+}
+
+.td-condition { font-size: 11px; color: var(--muted); }
+.td-pattern { font-weight: 500; font-size: 12px; }
+.td-effect { font-size: 11px; }
+
+.effect-badge {
+  display: inline-block;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-size: 10px;
+  font-family: var(--mono);
+  margin-top: 3px;
+}
+
+/* ─── SPECIES CHART ─── */
+.sp-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 8px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sp-btn:hover { border-color: var(--ink); }
+.sp-btn.active { background: var(--ink); color: #f7f4ef; border-color: var(--ink); }
+
+.chart-tab-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 10px 20px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: all 0.15s;
+}
+.chart-tab-btn.active { color: var(--ink); border-bottom-color: var(--ink); }
+.chart-tab-btn:hover:not(.active) { color: var(--ink); }
+
+.sp-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 3px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+
+.algo-block {
+  background: var(--ink);
+  border-radius: 6px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 2;
+  color: #d4d0c8;
+}
+
+.algo-comment { color: #6b7280; }
+.algo-keyword { color: #93c5fd; }
+.algo-func { color: #86efac; }
+.algo-num { color: #fcd34d; }
+.algo-var { color: #fda4af; }
+.algo-str { color: #c4b5fd; }
+
+.algo-section-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 24px 0 10px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div>
+    <div class="header-title">깃털 패턴 수학 도감</div>
+    <div class="header-sub">Feather Pattern · Mathematical Analysis · Algorithm</div>
+  </div>
+  <div class="header-badge">5 PATTERNS · INTERACTIVE</div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-strip" id="navStrip">
+  <div class="nav-tab active" data-sec="patterns" onclick="showSection('patterns',this)">
+    <span class="dot" style="background:#c84b2f"></span>패턴 분석
+  </div>
+  <div class="nav-tab" data-sec="table" onclick="showSection('table',this)">
+    <span class="dot" style="background:#1e4a8a"></span>수식 조건표
+  </div>
+  <div class="nav-tab" data-sec="algorithm" onclick="showSection('algorithm',this)">
+    <span class="dot" style="background:#7c3aed"></span>알고리즘 코드
+  </div>
+  <div class="nav-tab" data-sec="species" onclick="showSection('species',this)">
+    <span class="dot" style="background:#0891b2"></span>종별 비교 차트
+  </div>
+</nav>
+
+<div class="main-layout">
+
+  <!-- ── LEFT CONTENT ── -->
+  <div class="content-area">
+
+    <!-- SECTION 1: PATTERNS -->
+    <div class="section active" id="sec-patterns">
+
+      <!-- PATTERN 1 -->
+      <div class="pattern-block" id="pb1">
+        <div class="pb-header">
+          <span class="pb-num">01</span>
+          <span class="pb-name">일정한 비율로 퍼지는 깃털 구조 (Rachis & Barb)</span>
+          <span class="pb-tag" style="background:var(--accent1)">BRANCHING</span>
+        </div>
+        <div class="pb-body">
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">∑</span>수학 공식</div>
+            <div class="eq-box">
+              L(n) = L₀ · φ⁻ⁿ<br>
+              θ(n) = β·(1−e^{−αn})<br>
+              φ = 1.6180339...
+            </div>
+            <div class="eq-var">
+              <div class="var-row"><span class="var-sym">L₀</span><span class="var-desc">깃축 기준 길이</span></div>
+              <div class="var-row"><span class="var-sym">φ</span><span class="var-desc">황금비</span></div>
+              <div class="var-row"><span class="var-sym">β</span><span class="var-desc">최대 분기각</span></div>
+              <div class="var-row"><span class="var-sym">α</span><span class="var-desc">각도 수렴 속도</span></div>
+            </div>
+          </div>
+          <div class="pb-col pb-canvas-wrap">
+            <div class="col-label"><span class="icon">◈</span>패턴 시각화</div>
+            <canvas class="pb-canvas" id="c1"></canvas>
+          </div>
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">◎</span>효과 및 응용</div>
+            <div class="effect-list">
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent1)"></div>
+                <div class="effect-text">
+                  <strong>경량 고강도 구조</strong>
+                  φ⁻ⁿ 비율로 줄어드는 barb = 재료 최소화하면서 면적 최대화. 단위 질량당 강성 최적.
+                  <div class="application-chip">✈️ 드론 프레임 설계</div>
+                </div>
+              </div>
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent1)"></div>
+                <div class="effect-text">
+                  <strong>표면적 극대화</strong>
+                  n단계 분기 시 표면적 ∝ φⁿ 증가. 같은 부피에서 최대 접촉면.
+                  <div class="application-chip">🫁 인공 폐 필터 구조</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATTERN 2 -->
+      <div class="pattern-block" id="pb2">
+        <div class="pb-header">
+          <span class="pb-num">02</span>
+          <span class="pb-name">점점 잦아드는 물결 모양 깃 (Barb Curvature)</span>
+          <span class="pb-tag" style="background:var(--accent2)">WAVE</span>
+        </div>
+        <div class="pb-body">
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">∑</span>수학 공식</div>
+            <div class="eq-box">
+              y(x) = A·sin(ωx)·e^{−γx}<br>
+              ω = 2π/λ<br>
+              A: 진폭, γ: 감쇠계수
+            </div>
+            <div class="eq-var">
+              <div class="var-row"><span class="var-sym" style="color:var(--accent2)">A</span><span class="var-desc">barb 곡률 진폭</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent2)">ω</span><span class="var-desc">반복 주파수</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent2)">γ</span><span class="var-desc">감쇠 속도</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent2)">λ</span><span class="var-desc">파장 (간격)</span></div>
+            </div>
+          </div>
+          <div class="pb-col pb-canvas-wrap">
+            <div class="col-label"><span class="icon">◈</span>패턴 시각화</div>
+            <canvas class="pb-canvas" id="c2"></canvas>
+          </div>
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">◎</span>효과 및 응용</div>
+            <div class="effect-list">
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent2)"></div>
+                <div class="effect-text">
+                  <strong>올빼미 무음 비행</strong>
+                  γ 큰 앞날개 빗살 = 와류를 조기 소멸. 소음 주파수 4kHz 이상 30dB 감쇠.
+                  <div class="application-chip">✈️ 항공기 날개 leading edge</div>
+                </div>
+              </div>
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent2)"></div>
+                <div class="effect-text">
+                  <strong>충격 흡수</strong>
+                  감쇠파 구조 = 에너지를 열로 점진 변환. 헬멧·신발 충격재.
+                  <div class="application-chip">🏃 스포츠 쿠셔닝 소재</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATTERN 3 -->
+      <div class="pattern-block" id="pb3">
+        <div class="pb-header">
+          <span class="pb-num">03</span>
+          <span class="pb-name">빛의 반사로 색이 만들어지는 구조 (Thin-Film / 구조색)</span>
+          <span class="pb-tag" style="background:var(--accent3)">OPTICS</span>
+        </div>
+        <div class="pb-body">
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">∑</span>수학 공식</div>
+            <div class="eq-box">
+              λ_peak = 2nd·cos(θ)<br>
+              Δφ = 4πnd·cos(θ)/λ₀<br>
+              강화조건: Δφ = 2mπ
+            </div>
+            <div class="eq-var">
+              <div class="var-row"><span class="var-sym" style="color:var(--accent3)">n</span><span class="var-desc">굴절률 (멜라닌≈1.7)</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent3)">d</span><span class="var-desc">박막 두께 (nm)</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent3)">θ</span><span class="var-desc">입사각</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent3)">m</span><span class="var-desc">간섭 차수</span></div>
+            </div>
+          </div>
+          <div class="pb-col pb-canvas-wrap">
+            <div class="col-label"><span class="icon">◈</span>패턴 시각화</div>
+            <canvas class="pb-canvas" id="c3"></canvas>
+          </div>
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">◎</span>효과 및 응용</div>
+            <div class="effect-list">
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent3)"></div>
+                <div class="effect-text">
+                  <strong>색소 없는 발색</strong>
+                  공작새 d≈150nm → λ≈510nm(초록). 색소 퇴색 없음. 각도따라 색 변환.
+                  <div class="application-chip">🌈 위조방지 홀로그램</div>
+                </div>
+              </div>
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent3)"></div>
+                <div class="effect-text">
+                  <strong>염료 없는 디스플레이</strong>
+                  d 조절 → 원하는 λ 출력. 소비전력 없는 컬러 e-ink.
+                  <div class="application-chip">📱 반사형 컬러 디스플레이</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATTERN 4 -->
+      <div class="pattern-block" id="pb4">
+        <div class="pb-header">
+          <span class="pb-num">04</span>
+          <span class="pb-name">프랙탈 계층 구조 (Barbule Hierarchy)</span>
+          <span class="pb-tag" style="background:var(--accent4)">FRACTAL</span>
+        </div>
+        <div class="pb-body">
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">∑</span>수학 공식</div>
+            <div class="eq-box">
+              D = log(N) / log(1/r)<br>
+              N(ε) ∝ ε^{−D}<br>
+              down feather: D≈1.7
+            </div>
+            <div class="eq-var">
+              <div class="var-row"><span class="var-sym" style="color:var(--accent4)">D</span><span class="var-desc">프랙탈 차원</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent4)">N</span><span class="var-desc">자기유사 부분 수</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent4)">r</span><span class="var-desc">스케일 비율</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent4)">ε</span><span class="var-desc">측정 단위 크기</span></div>
+            </div>
+          </div>
+          <div class="pb-col pb-canvas-wrap">
+            <div class="col-label"><span class="icon">◈</span>패턴 시각화</div>
+            <canvas class="pb-canvas" id="c4"></canvas>
+          </div>
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">◎</span>효과 및 응용</div>
+            <div class="effect-list">
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent4)"></div>
+                <div class="effect-text">
+                  <strong>단열 최적화</strong>
+                  D≈1.7 구조 = 공기 포획량 극대화. 열전도율 λ ≈ 0.026 W/mK (공기 수준).
+                  <div class="application-chip">🌡️ 에어로겔 대체 단열재</div>
+                </div>
+              </div>
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent4)"></div>
+                <div class="effect-text">
+                  <strong>안테나 소형화</strong>
+                  프랙탈 안테나: 같은 D 구조 = 파장보다 훨씬 작은 크기로 광대역 수신.
+                  <div class="application-chip">📡 스마트폰 내장 안테나</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATTERN 5 -->
+      <div class="pattern-block" id="pb5">
+        <div class="pb-header">
+          <span class="pb-num">05</span>
+          <span class="pb-name">서로 걸려서 붙는 깃털 구조 (Barbule Zipper)</span>
+          <span class="pb-tag" style="background:var(--accent5)">MECHANISM</span>
+        </div>
+        <div class="pb-body">
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">∑</span>수학 공식</div>
+            <div class="eq-box">
+              F_hook = k·δ·cos(α)<br>
+              ρ_hook = N_hooks / L_barb<br>
+              E_unlock ∝ F·d_gap
+            </div>
+            <div class="eq-var">
+              <div class="var-row"><span class="var-sym" style="color:var(--accent5)">k</span><span class="var-desc">훅 탄성계수</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent5)">δ</span><span class="var-desc">변위 (맞물림 깊이)</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent5)">ρ</span><span class="var-desc">훅 밀도 (개/mm)</span></div>
+              <div class="var-row"><span class="var-sym" style="color:var(--accent5)">α</span><span class="var-desc">훅 각도</span></div>
+            </div>
+          </div>
+          <div class="pb-col pb-canvas-wrap">
+            <div class="col-label"><span class="icon">◈</span>패턴 시각화</div>
+            <canvas class="pb-canvas" id="c5"></canvas>
+          </div>
+          <div class="pb-col">
+            <div class="col-label"><span class="icon">◎</span>효과 및 응용</div>
+            <div class="effect-list">
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent5)"></div>
+                <div class="effect-text">
+                  <strong>가역적 건식 접착</strong>
+                  훅 ↔ 루프 맞물림. 벨크로의 원조 메커니즘. 반복 30만 회 이상.
+                  <div class="application-chip">🤖 소프트 로봇 그리퍼</div>
+                </div>
+              </div>
+              <div class="effect-item">
+                <div class="effect-dot" style="background:var(--accent5)"></div>
+                <div class="effect-text">
+                  <strong>자가 복원 소재</strong>
+                  손상된 barb를 물리적 자극으로 재결합. 스마트 직물·우주복 소재.
+                  <div class="application-chip">🛸 자가치유 항공 복합재</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sec-patterns -->
+
+    <!-- SECTION 2: TABLE -->
+    <div class="section" id="sec-table">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">수식 조건 → 패턴 → 효과 대응표</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">수학 조건이 바뀔 때 깃털 패턴과 물리적 효과가 어떻게 달라지는지 정리한 표입니다.</p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>수식</th>
+            <th>조건값</th>
+            <th>나타나는 패턴</th>
+            <th>물리적 효과</th>
+            <th>실생활 응용</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-formula">L(n)=L₀·φ⁻ⁿ</td>
+            <td class="td-condition">φ=1.618<br>(황금비)</td>
+            <td class="td-pattern">barb 길이가 1.618배씩 규칙적으로 감소 → 타원형 깃털 윤곽</td>
+            <td class="td-effect">최소 재료로 최대 표면적<div class="effect-badge">경량화 +40%</div></td>
+            <td style="font-size:11px;">드론 프레임<br>탄소섬유 설계</td>
+          </tr>
+          <tr>
+            <td class="td-formula">L(n)=L₀·φ⁻ⁿ</td>
+            <td class="td-condition">φ=1.0<br>(등비 없음)</td>
+            <td class="td-pattern">모든 barb 동일 길이 → 직사각형 깃털 형태</td>
+            <td class="td-effect">공기저항 증가, 비행 비효율<div class="effect-badge">항력 +60%</div></td>
+            <td style="font-size:11px;">해당 패턴 없음 (자연 미발생)</td>
+          </tr>
+          <tr>
+            <td class="td-formula">y=A·sin(ωx)·e^{−γx}</td>
+            <td class="td-condition">γ 크고<br>ω 높음</td>
+            <td class="td-pattern">barb 선단부에 촘촘한 빗살 구조 → 올빼미형 날개 패턴</td>
+            <td class="td-effect">湍流 소음 조기 소멸<div class="effect-badge">소음 −30dB</div></td>
+            <td style="font-size:11px;">항공기 엔진 나셀<br>풍력 터빈 블레이드</td>
+          </tr>
+          <tr>
+            <td class="td-formula">y=A·sin(ωx)·e^{−γx}</td>
+            <td class="td-condition">γ≈0<br>감쇠 없음</td>
+            <td class="td-pattern">일정한 물결 barb → 수생조류 방수 구조</td>
+            <td class="td-effect">물 접촉각 증가, 방수 효과<div class="effect-badge">θ_contact > 130°</div></td>
+            <td style="font-size:11px;">방수 직물<br>빗물 차단 코팅</td>
+          </tr>
+          <tr>
+            <td class="td-formula">λ=2nd·cos(θ)</td>
+            <td class="td-condition">d=150nm<br>n=1.7</td>
+            <td class="td-pattern">멜라닌 박막 → 초록 구조색 (공작새)</td>
+            <td class="td-effect">색소 없이 발색, 퇴색 없음<div class="effect-badge">λ≈510nm</div></td>
+            <td style="font-size:11px;">위조방지 인쇄<br>컬러 e-ink</td>
+          </tr>
+          <tr>
+            <td class="td-formula">λ=2nd·cos(θ)</td>
+            <td class="td-condition">d=80nm<br>n=1.5</td>
+            <td class="td-pattern">얇은 박막 → 파란 구조색 (물총새)</td>
+            <td class="td-effect">자외선 차단, 청색 반사<div class="effect-badge">λ≈240nm UV차단</div></td>
+            <td style="font-size:11px;">UV 차단 코팅<br>태양전지 반사 필터</td>
+          </tr>
+          <tr>
+            <td class="td-formula">D=log(N)/log(1/r)</td>
+            <td class="td-condition">D=1.7<br>(down 깃털)</td>
+            <td class="td-pattern">3D 분기 솜털 구조 → 공기 포획 네트워크</td>
+            <td class="td-effect">단열 극대화, λ_thermal ≈ 공기<div class="effect-badge">λ=0.026 W/mK</div></td>
+            <td style="font-size:11px;">에어로겔 단열재<br>패딩 의류</td>
+          </tr>
+          <tr>
+            <td class="td-formula">D=log(N)/log(1/r)</td>
+            <td class="td-condition">D=1.2~1.4<br>(contour 깃털)</td>
+            <td class="td-pattern">납작한 평면 barb 배열 → 유선형 표면</td>
+            <td class="td-effect">공기역학적 표면, 마찰 감소<div class="effect-badge">항력계수 Cd −15%</div></td>
+            <td style="font-size:11px;">수영복 표면 소재<br>자동차 외장 필름</td>
+          </tr>
+          <tr>
+            <td class="td-formula">F=k·δ·cos(α)</td>
+            <td class="td-condition">α=30°<br>ρ 높음</td>
+            <td class="td-pattern">갈고리(hook) 밀집 배열 → barbule 지퍼 패턴</td>
+            <td class="td-effect">방향성 탈부착 가능<div class="effect-badge">반복 30만 회</div></td>
+            <td style="font-size:11px;">벨크로 소재<br>의료용 접착 패치</td>
+          </tr>
+          <tr>
+            <td class="td-formula">F=k·δ·cos(α)</td>
+            <td class="td-condition">α→0°<br>수직 훅</td>
+            <td class="td-pattern">수직 훅 밀집 → 강력 고정 구조 (맹금류 발톱 기반)</td>
+            <td class="td-effect">최대 고정력, 분리 어려움<div class="effect-badge">F ∝ 1/cos(0°)=∞</div></td>
+            <td style="font-size:11px;">산업용 고정 클립<br>외과 봉합 소재</td>
+          </tr>
+        </tbody>
+      </table>
+    </div><!-- /sec-table -->
+
+    <!-- SECTION 3: ALGORITHM -->
+    <div class="section" id="sec-algorithm">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">패턴 생성 알고리즘</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">각 수식이 코드로 어떻게 구현되는지 보여주는 의사코드(pseudocode)입니다.</p>
+
+      <div class="algo-section-title">① 황금비 분기 구조 알고리즘</div>
+      <div class="algo-block">
+        <span class="algo-comment">// L(n) = L₀ · φ⁻ⁿ  |  θ(n) = β·(1−e^{−αn})</span><br>
+        <span class="algo-keyword">function</span> <span class="algo-func">generateRachis</span>(L0, phi, beta, alpha, n_max):<br>
+        &nbsp;&nbsp;<span class="algo-keyword">for</span> n <span class="algo-keyword">in</span> range(<span class="algo-num">0</span>, n_max):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="algo-var">barb_length</span> = L0 * phi**(-n)             <span class="algo-comment">// 황금비 감소</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="algo-var">angle</span>       = beta * (<span class="algo-num">1</span> - exp(-alpha*n))  <span class="algo-comment">// 분기각 수렴</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;drawBarb(x=rachis_x(n), y=rachis_y(n),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length=barb_length, theta=angle)<br>
+        &nbsp;&nbsp;<span class="algo-keyword">return</span> feather_shape<br>
+        <br>
+        <span class="algo-comment">// 결과: phi=1.618이면 타원형 깃털, phi=1.0이면 직사각형</span>
+      </div>
+
+      <div class="algo-section-title">② 감쇠 사인파 barb 곡률 알고리즘</div>
+      <div class="algo-block">
+        <span class="algo-comment">// y(x) = A·sin(ωx)·e^{−γx}</span><br>
+        <span class="algo-keyword">function</span> <span class="algo-func">generateBarbCurve</span>(A, omega, gamma, length):<br>
+        &nbsp;&nbsp;<span class="algo-var">points</span> = []<br>
+        &nbsp;&nbsp;<span class="algo-keyword">for</span> x <span class="algo-keyword">in</span> linspace(<span class="algo-num">0</span>, length, steps=<span class="algo-num">200</span>):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="algo-var">y</span> = A * sin(omega * x) * exp(-gamma * x)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;points.append((x, y))<br>
+        &nbsp;&nbsp;<span class="algo-keyword">return</span> points<br>
+        <br>
+        <span class="algo-comment">// gamma 크면 → 앞쪽만 파동 → 올빼미 날개 소음저감 패턴</span><br>
+        <span class="algo-comment">// gamma ≈ 0  → 균일 파동 → 수생조류 방수 패턴</span>
+      </div>
+
+      <div class="algo-section-title">③ 박막 간섭 색상 계산 알고리즘</div>
+      <div class="algo-block">
+        <span class="algo-comment">// λ_peak = 2·n·d·cos(θ)</span><br>
+        <span class="algo-keyword">function</span> <span class="algo-func">structuralColor</span>(n_refract, d_nm, theta_deg):<br>
+        &nbsp;&nbsp;<span class="algo-var">theta_r</span> = theta_deg * PI / <span class="algo-num">180</span><br>
+        &nbsp;&nbsp;<span class="algo-var">lambda_peak</span> = <span class="algo-num">2</span> * n_refract * d_nm * cos(theta_r)<br>
+        &nbsp;&nbsp;<span class="algo-comment">// nm → RGB 변환</span><br>
+        &nbsp;&nbsp;<span class="algo-var">color</span> = wavelengthToRGB(lambda_peak)<br>
+        &nbsp;&nbsp;<span class="algo-keyword">return</span> color<br>
+        <br>
+        <span class="algo-comment">// d=80nm  → 파랑(물총새)  d=150nm → 초록(공작)</span><br>
+        <span class="algo-comment">// d=200nm → 빨강(벌새)    모두 색소 없음</span>
+      </div>
+
+      <div class="algo-section-title">④ 프랙탈 차원 계산 알고리즘</div>
+      <div class="algo-block">
+        <span class="algo-comment">// D = log(N) / log(1/r)  — Box-counting method</span><br>
+        <span class="algo-keyword">function</span> <span class="algo-func">fractalDimension</span>(feather_image):<br>
+        &nbsp;&nbsp;<span class="algo-var">counts</span> = {}<br>
+        &nbsp;&nbsp;<span class="algo-keyword">for</span> box_size <span class="algo-keyword">in</span> [<span class="algo-num">2</span>,<span class="algo-num">4</span>,<span class="algo-num">8</span>,<span class="algo-num">16</span>,<span class="algo-num">32</span>,<span class="algo-num">64</span>]:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="algo-var">N</span> = countNonEmptyBoxes(feather_image, box_size)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;counts[box_size] = N<br>
+        &nbsp;&nbsp;<span class="algo-comment">// 로그-로그 기울기 = 프랙탈 차원 D</span><br>
+        &nbsp;&nbsp;<span class="algo-var">D</span> = -slope(log(box_sizes), log(counts))<br>
+        &nbsp;&nbsp;<span class="algo-keyword">return</span> D   <span class="algo-comment">// down feather ≈ 1.7, contour ≈ 1.3</span>
+      </div>
+
+      <div class="algo-section-title">⑤ 통합 파이프라인</div>
+      <div class="algo-block">
+        <span class="algo-comment">// 수식 조건 → 패턴 생성 → 효과 예측 파이프라인</span><br>
+        <span class="algo-keyword">function</span> <span class="algo-func">featherPipeline</span>(params):<br>
+        &nbsp;&nbsp;<span class="algo-comment">// STEP 1: 구조 생성</span><br>
+        &nbsp;&nbsp;<span class="algo-var">shape</span>  = generateRachis(params.L0, params.phi, params.beta)<br>
+        &nbsp;&nbsp;<span class="algo-var">curves</span> = generateBarbCurve(params.A, params.omega, params.gamma)<span class="algo-keyword"></span><br>
+        &nbsp;&nbsp;<span class="algo-comment">// STEP 2: 광학 특성</span><br>
+        &nbsp;&nbsp;<span class="algo-var">color</span>  = structuralColor(params.n, params.d, params.theta)<br>
+        &nbsp;&nbsp;<span class="algo-comment">// STEP 3: 기계적 특성 예측</span><br>
+        &nbsp;&nbsp;<span class="algo-var">D</span>      = fractalDimension(shape)<br>
+        &nbsp;&nbsp;<span class="algo-var">noise_reduction</span> = f(params.gamma, params.omega)  <span class="algo-comment">// dB</span><br>
+        &nbsp;&nbsp;<span class="algo-var">insulation</span>     = g(D)                           <span class="algo-comment">// W/mK</span><br>
+        &nbsp;&nbsp;<span class="algo-var">adhesion_force</span> = h(params.k, params.delta, params.alpha)<br>
+        &nbsp;&nbsp;<span class="algo-keyword">return</span> {shape, color, noise_reduction, insulation, adhesion_force}
+      </div>
+    </div><!-- /sec-algorithm -->
+
+    <!-- SECTION 4: SPECIES COMPARISON CHART -->
+    <div class="section" id="sec-species">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">새 종별 깃털 패턴 비교</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">5종의 대표 조류 깃털을 수학 파라미터로 비교합니다. 차트 항목을 클릭해 시각화를 확인하세요.</p>
+
+      <!-- Species selector -->
+      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;" id="species-tabs">
+        <button class="sp-btn active" data-sp="0" onclick="selectSpecies(0,this)">🦚 공작새</button>
+        <button class="sp-btn" data-sp="1" onclick="selectSpecies(1,this)">🦉 올빼미</button>
+        <button class="sp-btn" data-sp="2" onclick="selectSpecies(2,this)">🐧 펭귄</button>
+        <button class="sp-btn" data-sp="3" onclick="selectSpecies(3,this)">🦅 독수리</button>
+        <button class="sp-btn" data-sp="4" onclick="selectSpecies(4,this)">🐦 물총새</button>
+      </div>
+
+      <!-- Chart tabs -->
+      <div style="display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--rule);" id="chart-tabs">
+        <button class="chart-tab-btn active" onclick="selectChart('radar',this)">레이더 차트</button>
+        <button class="chart-tab-btn" onclick="selectChart('bar',this)">파라미터 비교</button>
+        <button class="chart-tab-btn" onclick="selectChart('feather',this)">깃털 구조 시각화</button>
+      </div>
+
+      <!-- Species info card -->
+      <div id="sp-card" style="background:var(--surface);border:1px solid var(--rule);border-top:none;border-radius:0 0 6px 6px;padding:20px 24px 16px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:22px;font-weight:700;margin-bottom:4px;" id="sp-name-big">공작새 (Pavo cristatus)</div>
+            <div style="font-size:12px;color:var(--muted);font-family:var(--mono);" id="sp-feature">특기: 구조색 발색 | 박막 두께 d≈150nm → 초록·파랑 간섭색</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="sp-badges"></div>
+        </div>
+      </div>
+
+      <!-- Chart panels -->
+      <div id="chart-radar" class="chart-panel">
+        <div style="background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:20px;">
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">5개 축 성능 비교 (0–10 척도)</div>
+          <canvas id="sp-radar" style="display:block;width:100%;height:320px;"></canvas>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;" id="sp-legend"></div>
+        </div>
+      </div>
+
+      <div id="chart-bar" class="chart-panel" style="display:none;">
+        <div style="background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:20px;">
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">수학 파라미터 절대값 비교</div>
+          <canvas id="sp-bar" style="display:block;width:100%;height:320px;"></canvas>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;" id="sp-bar-legend"></div>
+        </div>
+      </div>
+
+      <div id="chart-feather" class="chart-panel" style="display:none;">
+        <div style="background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:20px;">
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">선택 종 깃털 구조 시뮬레이션</div>
+          <canvas id="sp-feather" style="display:block;width:100%;height:320px;background:#fafaf8;border-radius:4px;"></canvas>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px;font-family:var(--mono);" id="sp-feather-note"></div>
+        </div>
+      </div>
+
+      <!-- Comparison table -->
+      <div style="background:var(--surface);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-top:20px;">
+        <table class="summary-table" id="sp-table">
+          <thead>
+            <tr>
+              <th>종</th>
+              <th>φ (황금비)</th>
+              <th>β 분기각</th>
+              <th>d 박막 (nm)</th>
+              <th>프랙탈 D</th>
+              <th>주요 기능</th>
+            </tr>
+          </thead>
+          <tbody id="sp-tbody"></tbody>
+        </table>
+      </div>
+    </div><!-- /sec-species -->
+
+  </div><!-- /content-area -->
+
+  <!-- ── RIGHT SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">파라미터 조절</div>
+      <div class="param-group">
+
+        <div class="param-row">
+          <div class="param-header">
+            <span class="param-name"><span class="param-sym" style="color:var(--accent1)">φ</span> 황금비</span>
+            <span class="param-value" id="pv-phi" style="color:var(--accent1)">1.618</span>
+          </div>
+          <input type="range" min="100" max="250" value="162" id="pr-phi" oninput="onParam()">
+        </div>
+
+        <div class="param-row">
+          <div class="param-header">
+            <span class="param-name"><span class="param-sym" style="color:var(--accent1)">β</span> 분기각 (°)</span>
+            <span class="param-value" id="pv-beta" style="color:var(--accent1)">25°</span>
+          </div>
+          <input type="range" min="5" max="55" value="25" id="pr-beta" oninput="onParam()">
+        </div>
+
+        <div class="param-row">
+          <div class="param-header">
+            <span class="param-name"><span class="param-sym" style="color:var(--accent2)">ω</span> 파동 주파수</span>
+            <span class="param-value" id="pv-omega" style="color:var(--accent2)">3.0</span>
+          </div>
+          <input type="range" min="5" max="100" value="30" id="pr-omega" oninput="onParam()">
+        </div>
+
+        <div class="param-row">
+          <div class="param-header">
+            <span class="param-name"><span class="param-sym" style="color:var(--accent2)">γ</span> 감쇠계수</span>
+            <span class="param-value" id="pv-gamma" style="color:var(--accent2)">1.5</span>
+          </div>
+          <input type="range" min="0" max="40" value="15" id="pr-gamma" oninput="onParam()">
+        </div>
+
+        <div class="param-row">
+          <div class="param-header">
+            <span class="param-name"><span class="param-sym" style="color:var(--accent3)">d</span> 박막 두께 (nm)</span>
+            <span class="param-value" id="pv-d" style="color:var(--accent3)">150nm</span>
+          </div>
+          <input type="range" min="60" max="280" value="150" id="pr-d" oninput="onParam()">
+        </div>
+
+        <div class="param-row">
+          <div class="param-header">
+            <span class="param-name"><span class="param-sym" style="color:var(--accent4)">D</span> 프랙탈 깊이</span>
+            <span class="param-value" id="pv-depth" style="color:var(--accent4)">4</span>
+          </div>
+          <input type="range" min="2" max="8" value="4" id="pr-depth" oninput="onParam()">
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">실시간 계산 결과</div>
+      <div class="live-readout" id="liveReadout">
+        <div class="readout-row"><span class="readout-key">L(5) / L₀</span><span class="readout-val" id="ro-ln">—</span></div>
+        <div class="readout-row"><span class="readout-key">λ_peak (nm)</span><span class="readout-val" id="ro-lam">—</span></div>
+        <div class="readout-row"><span class="readout-key">색상</span><span class="readout-val" id="ro-col">—</span></div>
+        <div class="readout-row"><span class="readout-key">프랙탈 D_est</span><span class="readout-val" id="ro-fd">—</span></div>
+        <div class="readout-row"><span class="readout-key">소음감쇠 ΔdB</span><span class="readout-val" id="ro-db">—</span></div>
+        <div class="readout-row"><span class="readout-key">단열성능</span><span class="readout-val" id="ro-ins">—</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">핵심 수식 색인</div>
+      <div class="formula-index">
+        <div class="fi-row" onclick="showSection('patterns',document.querySelector('[data-sec=patterns]'));document.getElementById('pb1').scrollIntoView({behavior:'smooth'})">
+          <span class="fi-num">①</span>
+          <div class="fi-content">
+            <div class="fi-formula">L(n) = L₀ · φ⁻ⁿ</div>
+            <div class="fi-name">황금비 분기 / 길이 감소</div>
+          </div>
+        </div>
+        <div class="fi-row">
+          <span class="fi-num">②</span>
+          <div class="fi-content">
+            <div class="fi-formula">y = A·sin(ωx)·e^{−γx}</div>
+            <div class="fi-name">감쇠 사인파 / barb 곡률</div>
+          </div>
+        </div>
+        <div class="fi-row">
+          <span class="fi-num">③</span>
+          <div class="fi-content">
+            <div class="fi-formula">λ = 2nd·cos(θ)</div>
+            <div class="fi-name">박막 간섭 / 구조색</div>
+          </div>
+        </div>
+        <div class="fi-row">
+          <span class="fi-num">④</span>
+          <div class="fi-content">
+            <div class="fi-formula">D = log(N)/log(1/r)</div>
+            <div class="fi-name">프랙탈 차원 / 계층 구조</div>
+          </div>
+        </div>
+        <div class="fi-row">
+          <span class="fi-num">⑤</span>
+          <div class="fi-content">
+            <div class="fi-formula">F = k·δ·cos(α)</div>
+            <div class="fi-name">훅 접착력 / barbule zipper</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+// ── SECTION TABS ───────────────────────────────────────────────────────────
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  drawAllCanvases();
+  if (id === 'species') {
+    setTimeout(() => { updateSpeciesCard(); drawCurrentChart(); buildTable(); }, 50);
+  }
+}
+
+// ── GET PARAMS ─────────────────────────────────────────────────────────────
+function P() {
+  return {
+    phi:   +document.getElementById('pr-phi').value / 100,
+    beta:  +document.getElementById('pr-beta').value,
+    omega: +document.getElementById('pr-omega').value / 10,
+    gamma: +document.getElementById('pr-gamma').value / 10,
+    d:     +document.getElementById('pr-d').value,
+    depth: +document.getElementById('pr-depth').value,
+  };
+}
+
+function onParam() {
+  const p = P();
+  document.getElementById('pv-phi').textContent   = p.phi.toFixed(3);
+  document.getElementById('pv-beta').textContent  = p.beta + '°';
+  document.getElementById('pv-omega').textContent = p.omega.toFixed(1);
+  document.getElementById('pv-gamma').textContent = p.gamma.toFixed(1);
+  document.getElementById('pv-d').textContent     = p.d + 'nm';
+  document.getElementById('pv-depth').textContent = p.depth;
+  updateReadout(p);
+  drawAllCanvases();
+}
+
+// ── LIVE READOUT ────────────────────────────────────────────────────────────
+function updateReadout(p) {
+  const ln = Math.pow(p.phi, -5).toFixed(4);
+  document.getElementById('ro-ln').textContent = ln;
+
+  const lam = (2 * 1.7 * p.d * 1).toFixed(0);
+  document.getElementById('ro-lam').textContent = lam + ' nm';
+  document.getElementById('ro-col').textContent = lambdaToName(+lam);
+
+  const fd = (Math.log(p.depth * 3) / Math.log(p.phi + 0.01)).toFixed(2);
+  document.getElementById('ro-fd').textContent = fd;
+
+  const db = (p.gamma * 3 + p.omega * 1.5).toFixed(1);
+  document.getElementById('ro-db').textContent = '−' + db + ' dB';
+
+  const ins_inv = 0.026 + 0.01 * (2 - (+fd));
+  document.getElementById('ro-ins').textContent = Math.max(0.020, ins_inv).toFixed(3) + ' W/mK';
+}
+
+function lambdaToName(nm) {
+  if (nm < 380) return '자외선 (UV)';
+  if (nm < 450) return '보라 (Violet)';
+  if (nm < 495) return '파랑 (Blue)';
+  if (nm < 570) return '초록 (Green)';
+  if (nm < 620) return '노랑 (Yellow)';
+  if (nm < 700) return '빨강 (Red)';
+  return '적외선 (IR)';
+}
+
+// ── CANVAS DRAWS ────────────────────────────────────────────────────────────
+function setupCanvas(id) {
+  const cv = document.getElementById(id);
+  if (!cv) return null;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  cv.width  = rect.width  * dpr;
+  cv.height = rect.height * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, W: rect.width, H: rect.height };
+}
+
+// C1: Branching
+function drawC1() {
+  const r = setupCanvas('c1'); if (!r) return;
+  const { ctx, W, H } = r;
+  const p = P();
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, baseY = H * 0.92, rachisH = H * 0.80;
+  const numBarbs = Math.round(22 * p.depth / 4);
+
+  // rachis
+  ctx.beginPath();
+  for (let t = 0; t <= 1; t += 0.02) {
+    const x = cx, y = baseY - t * rachisH;
+    t === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#c84b2f';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  for (let i = 0; i < numBarbs; i++) {
+    const t = i / (numBarbs - 1);
+    const sy = baseY - t * rachisH;
+    const blen = rachisH * 0.28 * Math.pow(p.phi, -i * 0.09) * (1 - t * 0.35 + 0.05);
+    const ang  = (p.beta * (1 - Math.exp(-4 * t))) * Math.PI / 180;
+
+    for (const s of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(cx, sy);
+      const steps = 20;
+      for (let k = 0; k <= steps; k++) {
+        const bx = (k / steps) * blen;
+        const by = Math.sin(p.omega * bx / blen * Math.PI * 1.5) * blen * 0.03 * Math.exp(-p.gamma * k / steps);
+        const rx = cx + s * (bx * Math.cos(ang) - by * Math.sin(ang));
+        const ry = sy - (bx * Math.sin(ang) + by * Math.cos(ang));
+        ctx.lineTo(rx, ry);
+      }
+      ctx.strokeStyle = `hsla(18,65%,${38 + t * 25}%, 0.75)`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+  }
+  // phi label
+  ctx.fillStyle = '#c84b2f';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillText(`φ=${p.phi.toFixed(3)}, β=${p.beta}°`, 8, H - 8);
+}
+
+// C2: Damped sine
+function drawC2() {
+  const r = setupCanvas('c2'); if (!r) return;
+  const { ctx, W, H } = r;
+  const p = P();
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(0, 0, W, H);
+
+  const numWaves = 7;
+  for (let wi = 0; wi < numWaves; wi++) {
+    const baseY = (wi / numWaves) * H + H / numWaves / 2 + 6;
+    const A = H * 0.045 * (1 + 0.3 * Math.sin(wi * 0.9));
+    ctx.beginPath();
+    for (let sx = 0; sx <= W; sx += 1.5) {
+      const t = sx / W;
+      const y = baseY + A * Math.sin(p.omega * t * Math.PI * 2) * Math.exp(-p.gamma * t);
+      sx === 0 ? ctx.moveTo(sx, y) : ctx.lineTo(sx, y);
+    }
+    const alpha = 0.5 + 0.35 * (1 - wi / numWaves);
+    ctx.strokeStyle = `hsla(145,55%,${32 + wi * 5}%, ${alpha})`;
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+  }
+
+  // annotation: gamma
+  ctx.fillStyle = '#2a6b4f';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillText(`ω=${p.omega.toFixed(1)}, γ=${p.gamma.toFixed(1)}`, 8, H - 8);
+  // e^-γx label at right
+  ctx.fillStyle = 'rgba(42,107,79,0.5)';
+  ctx.fillText(`e^{−${p.gamma.toFixed(1)}x}`, W - 80, 14);
+}
+
+// C3: Thin-film iridescence
+function drawC3() {
+  const r = setupCanvas('c3'); if (!r) return;
+  const { ctx, W, H } = r;
+  const p = P();
+  ctx.fillStyle = '#0a0c12';
+  ctx.fillRect(0, 0, W, H);
+
+  const cols = 30, rows = 10;
+  const cw = W / cols, ch = H / rows;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const phase = (col / cols + row / rows * 0.3) * Math.PI * 2;
+      const d_local = p.d * (0.85 + 0.3 * Math.sin(phase));
+      const n = 1.7;
+      const lam = 2 * n * d_local;
+      const hue = nmToHue(lam);
+      const sat = 75 + 15 * Math.sin(phase * 1.3);
+      const lit = 35 + 20 * Math.abs(Math.sin(phase));
+      const x = col * cw + cw / 2, y = row * ch + ch / 2;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, cw * 0.5);
+      g.addColorStop(0, `hsla(${hue},${sat}%,${lit + 18}%,0.95)`);
+      g.addColorStop(1, `hsla(${hue},${sat}%,${lit}%,0)`);
+      ctx.fillStyle = g;
+      hexPath(ctx, x, y, cw * 0.48);
+      ctx.fill();
+    }
+  }
+
+  const lam_c = (2 * 1.7 * p.d).toFixed(0);
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillText(`d=${p.d}nm → λ≈${lam_c}nm  (${lambdaToName(+lam_c)})`, 8, H - 8);
+}
+
+function nmToHue(nm) {
+  const clamped = Math.min(700, Math.max(380, nm));
+  return 270 - ((clamped - 380) / 320) * 270;
+}
+
+function hexPath(ctx, x, y, r) {
+  ctx.beginPath();
+  for (let i = 0; i <= 6; i++) {
+    const a = i * Math.PI / 3;
+    i === 0 ? ctx.moveTo(x + r * Math.cos(a), y + r * Math.sin(a))
+            : ctx.lineTo(x + r * Math.cos(a), y + r * Math.sin(a));
+  }
+  ctx.closePath();
+}
+
+// C4: Fractal tree
+function drawC4() {
+  const r = setupCanvas('c4'); if (!r) return;
+  const { ctx, W, H } = r;
+  const p = P();
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(0, 0, W, H);
+
+  const L0 = Math.min(W, H) * 0.30;
+  function branch(x, y, angle, len, d) {
+    if (d < 0 || len < 1.5) return;
+    const ex = x + Math.cos(angle) * len;
+    const ey = y + Math.sin(angle) * len;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(ex, ey);
+    ctx.strokeStyle = `hsla(270,55%,${35 + d * 9}%, ${0.5 + d * 0.07})`;
+    ctx.lineWidth = Math.max(0.4, d * 0.5);
+    ctx.stroke();
+    const a = p.beta * Math.PI / 180;
+    branch(ex, ey, angle, len / p.phi, d - 1);
+    branch(ex, ey, angle + a, len * 0.65 / p.phi, d - 1);
+    branch(ex, ey, angle - a, len * 0.65 / p.phi, d - 1);
+  }
+  branch(W / 2, H * 0.95, -Math.PI / 2, L0, p.depth);
+
+  const D = (Math.log(p.depth * 3) / Math.log(p.phi + 0.01)).toFixed(2);
+  ctx.fillStyle = '#7c3aed';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillText(`D≈${D}, depth=${p.depth}`, 8, H - 8);
+}
+
+// C5: Hook mechanism
+function drawC5() {
+  const r = setupCanvas('c5'); if (!r) return;
+  const { ctx, W, H } = r;
+  const p = P();
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(0, 0, W, H);
+
+  const numHooks = 18;
+  const spacing  = W / (numHooks + 1);
+  const midY = H / 2;
+
+  // barb line
+  ctx.beginPath(); ctx.moveTo(0, midY - 18); ctx.lineTo(W, midY - 18);
+  ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, midY + 18); ctx.lineTo(W, midY + 18);
+  ctx.strokeStyle = '#1e4a8a'; ctx.lineWidth = 2; ctx.stroke();
+
+  const alpha_r = p.beta * Math.PI / 180;
+  for (let i = 1; i <= numHooks; i++) {
+    const x = i * spacing;
+    // upper hooks (pointing down)
+    ctx.beginPath();
+    ctx.moveTo(x, midY - 18);
+    ctx.lineTo(x, midY - 6);
+    ctx.lineTo(x + 7 * Math.cos(alpha_r), midY - 6 + 7 * Math.sin(alpha_r));
+    ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // lower loops (opposite)
+    ctx.beginPath();
+    ctx.moveTo(x, midY + 18);
+    ctx.lineTo(x, midY + 6);
+    ctx.arc(x, midY + 4, 4, Math.PI * 0.5, Math.PI * 1.5, false);
+    ctx.strokeStyle = '#1e4a8a';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // engagement dot
+    if (i % 2 === 0) {
+      ctx.beginPath();
+      ctx.arc(x, midY, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(180,83,9,0.5)';
+      ctx.fill();
+    }
+  }
+
+  const F = (5.2 * Math.cos(alpha_r)).toFixed(2);
+  ctx.fillStyle = '#b45309';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillText(`F_hook≈${F}N, α=${p.beta}°, ρ=${numHooks}개/barb`, 8, H - 8);
+}
+
+function drawAllCanvases() {
+  drawC1(); drawC2(); drawC3(); drawC4(); drawC5();
+}
+
+// ── SPECIES DATA ───────────────────────────────────────────────────────────
+const SPECIES = [
+  {
+    name: '공작새 (Pavo cristatus)',
+    emoji: '🦚',
+    feature: '특기: 구조색 발색 | 박막 두께 d≈150nm → 초록·파랑 간섭색',
+    phi: 1.62, beta: 22, d: 150, fractal: 1.35, omega: 2.5, gamma: 0.8,
+    badges: [{label:'구조색', color:'#1e4a8a'},{label:'과시 깃털', color:'#7c3aed'}],
+    radar: [8, 3, 10, 5, 4],   // [단열, 소음차단, 구조색, 분기효율, 훅강도]
+    barParams: [1.62, 22, 150, 1.35, 2.5],
+    barColor: '#1e4a8a',
+    desc: '공작새의 깃털 눈 무늬는 박막 두께 d≈150nm 층이 규칙적으로 쌓여 색소 없이 초록·파랑을 만든다.',
+  },
+  {
+    name: '올빼미 (Strix aluco)',
+    emoji: '🦉',
+    feature: '특기: 무음 비행 | 앞날개 빗살 구조로 와류 조기 소멸, 4kHz 이상 30dB 감쇠',
+    phi: 1.55, beta: 30, d: 110, fractal: 1.55, omega: 5.8, gamma: 3.2,
+    badges: [{label:'무음비행', color:'#2a6b4f'},{label:'소음차단', color:'#c84b2f'}],
+    radar: [6, 10, 2, 7, 3],
+    barParams: [1.55, 30, 110, 1.55, 5.8],
+    barColor: '#2a6b4f',
+    desc: '올빼미 앞날개 빗살(comb)의 높은 감쇠계수 γ≈3.2가 와류를 조기 소멸시켜 무음 비행을 가능하게 한다.',
+  },
+  {
+    name: '펭귄 (Aptenodytes forsteri)',
+    emoji: '🐧',
+    feature: '특기: 극한 단열 | 프랙탈 D≈1.7 솜털 구조로 공기 포획 극대화, λ≈0.026 W/mK',
+    phi: 1.48, beta: 15, d: 90, fractal: 1.72, omega: 1.2, gamma: 0.4,
+    badges: [{label:'극한단열', color:'#7c3aed'},{label:'방수', color:'#1e4a8a'}],
+    radar: [10, 4, 1, 6, 6],
+    barParams: [1.48, 15, 90, 1.72, 1.2],
+    barColor: '#7c3aed',
+    desc: '펭귄 솜털의 프랙탈 차원 D≈1.72는 단열재 중 최고 수준의 공기 포획량을 제공한다.',
+  },
+  {
+    name: '독수리 (Aquila chrysaetos)',
+    emoji: '🦅',
+    feature: '특기: 고하중 비행 | 황금비 분기로 비행깃 강성 최적화, 비행효율 극대화',
+    phi: 1.68, beta: 40, d: 120, fractal: 1.28, omega: 1.8, gamma: 1.1,
+    badges: [{label:'고강도', color:'#c84b2f'},{label:'활공효율', color:'#b45309'}],
+    radar: [4, 5, 3, 10, 8],
+    barParams: [1.68, 40, 120, 1.28, 1.8],
+    barColor: '#c84b2f',
+    desc: '독수리 비행깃은 φ≈1.68의 황금비 분기와 β≈40° 넓은 분기각으로 고하중 활공에 최적화된 구조다.',
+  },
+  {
+    name: '물총새 (Alcedo atthis)',
+    emoji: '🐦',
+    feature: '특기: 저저항 입수 | 부리 형태+깃털 d≈80nm 구조색, 물 충격파 최소화',
+    phi: 1.58, beta: 18, d: 80, fractal: 1.42, omega: 3.1, gamma: 1.6,
+    badges: [{label:'유체역학', color:'#0891b2'},{label:'구조색', color:'#1e4a8a'}],
+    radar: [5, 6, 7, 7, 5],
+    barParams: [1.58, 18, 80, 1.42, 3.1],
+    barColor: '#0891b2',
+    desc: '물총새 d≈80nm 박막은 파란색 구조색을 만들고, 신칸센 차두(bullet nose) 설계에 영향을 준 유선형 구조다.',
+  },
+];
+
+const RADAR_LABELS = ['단열성', '소음차단', '구조색', '분기효율', '훅·강도'];
+const BAR_LABELS = ['φ 황금비', 'β 분기각 (°)', 'd 박막 (nm)/10', '프랙탈 D×5', 'ω 주파수'];
+
+let currentSpecies = 0;
+let currentChart = 'radar';
+
+function selectSpecies(idx, el) {
+  currentSpecies = idx;
+  document.querySelectorAll('.sp-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  updateSpeciesCard();
+  drawCurrentChart();
+  buildTable();
+}
+
+function selectChart(type, el) {
+  currentChart = type;
+  document.querySelectorAll('.chart-tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  ['radar','bar','feather'].forEach(t => {
+    document.getElementById('chart-' + t).style.display = t === type ? '' : 'none';
+  });
+  drawCurrentChart();
+}
+
+function updateSpeciesCard() {
+  const sp = SPECIES[currentSpecies];
+  document.getElementById('sp-name-big').textContent = sp.emoji + ' ' + sp.name;
+  document.getElementById('sp-feature').textContent = sp.feature;
+  const bd = document.getElementById('sp-badges');
+  bd.innerHTML = sp.badges.map(b =>
+    `<span class="sp-badge" style="background:${b.color}">${b.label}</span>`
+  ).join('');
+}
+
+function drawCurrentChart() {
+  if (currentChart === 'radar') drawRadar();
+  else if (currentChart === 'bar') drawBar();
+  else drawFeatherChart();
+}
+
+// ── RADAR CHART ────────────────────────────────────────────────────────────
+function drawRadar() {
+  const cv = document.getElementById('sp-radar');
+  if (!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  cv.width  = rect.width  * dpr;
+  cv.height = rect.height * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H / 2 + 10;
+  const R = Math.min(W, H) * 0.35;
+  const N = 5;
+  const angles = Array.from({length:N}, (_,i) => -Math.PI/2 + i * 2 * Math.PI / N);
+
+  // grid rings
+  for (let ring = 2; ring <= 10; ring += 2) {
+    ctx.beginPath();
+    angles.forEach((a, i) => {
+      const r = R * ring / 10;
+      i === 0 ? ctx.moveTo(cx + Math.cos(a)*r, cy + Math.sin(a)*r)
+              : ctx.lineTo(cx + Math.cos(a)*r, cy + Math.sin(a)*r);
+    });
+    ctx.closePath();
+    ctx.strokeStyle = ring === 10 ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.06)';
+    ctx.lineWidth = ring === 10 ? 1 : 0.5;
+    ctx.stroke();
+  }
+  // spokes
+  angles.forEach(a => {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(a)*R, cy + Math.sin(a)*R);
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  });
+
+  // draw all species (dimmed), current species highlighted
+  SPECIES.forEach((sp, si) => {
+    const isCurrent = si === currentSpecies;
+    ctx.beginPath();
+    sp.radar.forEach((val, i) => {
+      const a = angles[i];
+      const r = R * val / 10;
+      i === 0 ? ctx.moveTo(cx + Math.cos(a)*r, cy + Math.sin(a)*r)
+              : ctx.lineTo(cx + Math.cos(a)*r, cy + Math.sin(a)*r);
+    });
+    ctx.closePath();
+    ctx.fillStyle = isCurrent ? hexAlpha(sp.barColor, 0.18) : 'transparent';
+    ctx.fill();
+    ctx.strokeStyle = isCurrent ? sp.barColor : hexAlpha(sp.barColor, 0.3);
+    ctx.lineWidth = isCurrent ? 2.5 : 1;
+    ctx.stroke();
+
+    // dots for current
+    if (isCurrent) {
+      sp.radar.forEach((val, i) => {
+        const a = angles[i];
+        const r = R * val / 10;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a)*r, cy + Math.sin(a)*r, 4, 0, Math.PI*2);
+        ctx.fillStyle = sp.barColor;
+        ctx.fill();
+      });
+    }
+  });
+
+  // axis labels
+  ctx.font = `700 11px 'Noto Sans KR', sans-serif`;
+  ctx.fillStyle = '#1a1614';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  angles.forEach((a, i) => {
+    const lr = R + 22;
+    const lx = cx + Math.cos(a) * lr;
+    const ly = cy + Math.sin(a) * lr;
+    ctx.fillText(RADAR_LABELS[i], lx, ly);
+  });
+
+  // legend
+  const leg = document.getElementById('sp-legend');
+  leg.innerHTML = SPECIES.map((sp,si) =>
+    `<div style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;opacity:${si===currentSpecies?1:0.45}" onclick="selectSpecies(${si},document.querySelectorAll('.sp-btn')[${si}])">
+      <span style="display:inline-block;width:14px;height:3px;background:${sp.barColor};border-radius:2px"></span>${sp.emoji} ${sp.name.split('(')[0].trim()}
+    </div>`
+  ).join('');
+}
+
+// ── BAR CHART ──────────────────────────────────────────────────────────────
+function drawBar() {
+  const cv = document.getElementById('sp-bar');
+  if (!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  cv.width = rect.width * dpr; cv.height = rect.height * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  ctx.fillStyle = '#fafaf8'; ctx.fillRect(0,0,W,H);
+
+  const padL = 110, padR = 20, padT = 20, padB = 40;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  // normalize data: each param 0–1 for display (relative)
+  const paramCount = 5;
+  const maxVals = [2.0, 55, 30, 2.0, 10]; // max for each param (scaled)
+  const groupW = chartW / paramCount;
+  const barW = groupW / (SPECIES.length + 1);
+
+  // grid lines
+  [0.25, 0.5, 0.75, 1.0].forEach(frac => {
+    const y = padT + chartH * (1 - frac);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y);
+    ctx.strokeStyle = 'rgba(0,0,0,0.07)'; ctx.lineWidth = 0.7; ctx.stroke();
+  });
+
+  // bars
+  SPECIES.forEach((sp, si) => {
+    sp.barParams.forEach((val, pi) => {
+      const norm = Math.min(1, val / maxVals[pi]);
+      const x = padL + pi * groupW + (si + 0.5) * barW;
+      const bh = norm * chartH;
+      const y = padT + chartH - bh;
+      const isCurrent = si === currentSpecies;
+      ctx.fillStyle = isCurrent ? sp.barColor : hexAlpha(sp.barColor, 0.35);
+      ctx.fillRect(x, y, barW * 0.8, bh);
+    });
+  });
+
+  // x labels
+  ctx.font = `500 10px 'JetBrains Mono', monospace`;
+  ctx.fillStyle = '#7a726a'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  BAR_LABELS.forEach((lbl, pi) => {
+    ctx.fillText(lbl, padL + pi * groupW + groupW / 2, H - padB + 8);
+  });
+
+  // y axis label
+  ctx.save(); ctx.translate(12, padT + chartH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = '#7a726a'; ctx.font = `10px 'JetBrains Mono', monospace`;
+  ctx.textAlign = 'center'; ctx.fillText('정규화 값 (상대적)', 0, 0);
+  ctx.restore();
+
+  // legend
+  const leg = document.getElementById('sp-bar-legend');
+  leg.innerHTML = SPECIES.map((sp,si) =>
+    `<div style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;opacity:${si===currentSpecies?1:0.45}" onclick="selectSpecies(${si},document.querySelectorAll('.sp-btn')[${si}])">
+      <span style="display:inline-block;width:12px;height:12px;background:${sp.barColor};border-radius:2px"></span>${sp.emoji} ${sp.name.split('(')[0].trim()}
+    </div>`
+  ).join('');
+}
+
+// ── FEATHER STRUCTURE CHART ─────────────────────────────────────────────────
+function drawFeatherChart() {
+  const sp = SPECIES[currentSpecies];
+  const cv = document.getElementById('sp-feather');
+  if (!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  cv.width = rect.width * dpr; cv.height = rect.height * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  ctx.fillStyle = '#fafaf8'; ctx.fillRect(0,0,W,H);
+
+  // Draw feather using this species' params
+  const phi = sp.phi, beta = sp.beta, omega = sp.omega, gamma = sp.gamma, depth = 5;
+  const cx = W / 2, baseY = H * 0.93, rachisH = H * 0.82;
+  const numBarbs = 26;
+  const col = sp.barColor;
+
+  // rachis
+  ctx.beginPath();
+  ctx.moveTo(cx, baseY);
+  ctx.lineTo(cx, baseY - rachisH);
+  ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.stroke();
+
+  for (let i = 0; i < numBarbs; i++) {
+    const t = i / (numBarbs - 1);
+    const sy = baseY - t * rachisH;
+    const blen = rachisH * 0.30 * Math.pow(phi, -i * 0.09) * (1 - t * 0.35 + 0.05);
+    const ang  = (beta * (1 - Math.exp(-4 * t))) * Math.PI / 180;
+
+    for (const s of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(cx, sy);
+      for (let k = 0; k <= 24; k++) {
+        const bx = (k / 24) * blen;
+        const by = Math.sin(omega * bx / blen * Math.PI * 1.5) * blen * 0.03 * Math.exp(-gamma * k / 24);
+        const rx = cx + s * (bx * Math.cos(ang) - by * Math.sin(ang));
+        const ry = sy - (bx * Math.sin(ang) + by * Math.cos(ang));
+        ctx.lineTo(rx, ry);
+      }
+      ctx.strokeStyle = hexAlpha(col, 0.65 + t * 0.2);
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+    }
+  }
+
+  // label
+  ctx.fillStyle = col;
+  ctx.font = `bold 12px 'JetBrains Mono', monospace`;
+  ctx.fillText(`${sp.emoji} ${sp.name.split('(')[0].trim()}`, 12, 20);
+  ctx.font = `10px 'JetBrains Mono', monospace`;
+  ctx.fillStyle = '#7a726a';
+  ctx.fillText(`φ=${phi}  β=${beta}°  ω=${omega}  γ=${gamma}`, 12, 36);
+
+  document.getElementById('sp-feather-note').textContent = sp.desc;
+}
+
+// ── TABLE ──────────────────────────────────────────────────────────────────
+function buildTable() {
+  const tbody = document.getElementById('sp-tbody');
+  tbody.innerHTML = SPECIES.map((sp, si) => `
+    <tr style="${si===currentSpecies?'background:#f0ede8;font-weight:600':''}" 
+        onclick="selectSpecies(${si},document.querySelectorAll('.sp-btn')[${si}])" style="cursor:pointer">
+      <td style="font-size:13px;">${sp.emoji} ${sp.name.split('(')[0].trim()}</td>
+      <td class="td-formula">${sp.phi}</td>
+      <td class="td-formula">${sp.beta}°</td>
+      <td class="td-formula">${sp.d}</td>
+      <td class="td-formula">${sp.fractal}</td>
+      <td style="font-size:11px;">${sp.badges.map(b=>`<span class="effect-badge" style="border-color:${b.color};color:${b.color}">${b.label}</span>`).join(' ')}</td>
+    </tr>
+  `).join('');
+}
+
+function hexAlpha(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// init species chart when tab is first opened
+function initSpeciesIfNeeded() {
+  if (!document.getElementById('sp-radar').getAttribute('data-init')) {
+    document.getElementById('sp-radar').setAttribute('data-init','1');
+    updateSpeciesCard();
+    drawCurrentChart();
+    buildTable();
+  }
+}
+
+
+window.addEventListener('resize', drawAllCanvases);
+onParam();  // initial draw
+</script>
+</body>
+</html>

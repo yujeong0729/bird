@@ -1,4 +1,4 @@
 # bird
 
-https://github.com/yujeong0729/bird/blob/main/README.md
+ https://yujeong0729.github.io/bird/
 
